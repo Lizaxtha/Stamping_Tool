@@ -1,11 +1,15 @@
 from krita import *
+import os
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
     QVBoxLayout,
     QLabel,
     QPushButton,
     QListWidget,
-    QFileDIalog
+    QListWidgetItem,
+    QFileDialog
 )
 
 class StampDialog(QDialog):
@@ -19,18 +23,94 @@ class StampDialog(QDialog):
 
         layout =QVBoxLayout()
 
-        # title = QLabel("Stamp")
-        # layout.addWidget(title)
+        title = QLabel("Choose one or more stamps")
+        layout.addWidget(title)
 
-        description = QLabel(
-            "Choose one or more stamps"
+        self.stamp_list = QListWidget()
+
+        self.stamp_list.setSelectionMode(
+            QListWidget.MultiSelection
         )
-        layout.addWidget(description)
 
-        custom_button = QPushButton("Custom Stamp")
+        self.stamp_list.setViewMode(
+            QListWidget.IconMode
+        )
+
+        self.stamp_list.setIconSize(
+            QSize(80,80)
+        )
+
+        self.stamp_list.setResizeMode(
+            QListWidget.Adjust
+        )
+
+        self.load_builtin_stamps()
+
+        layout.addWidget(self.stamp_list)
+
+        custom_button=QPushButton("+ Custom Stamp")
+        custom_button.clicked.connect(self.add_custom_stamp)
+
         layout.addWidget(custom_button)
 
         self.setLayout(layout)
+
+    def add_custom_stamp(self):
+
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Choose a stamp image",
+            "",
+            "Images (*.png *.jpg *.jpeg *.webp)"
+        )
+
+        if not file_path:
+            return
+
+        allowed_extensions =(".png",".jpg",".jpeg",".webp")
+
+        if not file_path.lower().endswith(allowed_extensions):
+            return
+
+        file_name = os.path.basename(file_path)
+
+        icon=QIcon(file_path)
+        item =QListWidgetItem(
+            icon,
+            file_name
+        )
+
+        self.stamp_list.addItem(item)
+        self.stamps.append(file_path)
+
+    def load_builtin_stamps(self):
+
+        assets_folder =os.path.join(
+            os.path.dirname(__file__),
+            "assets"
+        )
+
+        builtin_stamps=[
+        "",
+        ]
+
+        for stamp in builtin_stamps:
+
+            stamp_path =os.path.join(
+                assets_folder,
+                stamp
+            )
+
+            if os.path.exists(stamp_path):
+
+                item=QListWidgetItem(
+                    QIcon(stamp_path),
+                    stamp.replace(".png")
+                )
+
+                self.stamp_list.addItem(item)
+
+                self.stamps.append(stamp_path)
 class StampTool(Extension):
 
     def __init__(self, parent):
@@ -41,8 +121,8 @@ class StampTool(Extension):
 
     def createActions(self,window):
         action=window.createAction(
-            "stamp_tool_test",
-            "Stamp Tool test",
+            "stamp_tool",
+            "Stamp Tool",
             "tools/scripts"
         )
 
