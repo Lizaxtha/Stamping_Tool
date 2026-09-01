@@ -5,7 +5,6 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
     QVBoxLayout,
-    QHBoxLayout,
     QLabel,
     QPushButton,
     QListWidget,
@@ -104,6 +103,7 @@ class StampDialog(QDialog):
         create_button=QPushButton("Create")
         layout.addWidget(create_button)
 
+
     def add_custom_stamp(self):
 
         file_path, _ = QFileDialog.getOpenFileName(
@@ -121,16 +121,12 @@ class StampDialog(QDialog):
         if not file_path.lower().endswith(allowed_extensions):
             return
 
-        file_name = os.path.basename(file_path)
-
-        icon=QIcon(file_path)
-        item =QListWidgetItem(
-            icon,
-            file_name
-        )
+        item =QListWidgetItem()
+        item.setIcon(QIcon(file_path))
 
         self.stamp_list.addItem(item)
         self.stamps.append(file_path)
+
 
     def load_builtin_stamps(self):
 
@@ -140,7 +136,15 @@ class StampDialog(QDialog):
         )
 
         builtin_stamps=[
-        "",
+        "Heart.png",
+        "C-moon.png",
+        "Star.png",
+        "Moon.png",
+        "Leaf.png",
+        "Autumn-Leaf.png",
+        "Eifell-Tower.png",
+        "Glittering-Star.png"
+
         ]
 
         for stamp in builtin_stamps:
@@ -152,10 +156,8 @@ class StampDialog(QDialog):
 
             if os.path.exists(stamp_path):
 
-                item=QListWidgetItem(
-                    QIcon(stamp_path),
-                    stamp.replace(".png","")
-                )
+                item=QListWidgetItem()
+                item.setIcon(QIcon(stamp_path))
 
                 self.stamp_list.addItem(item)
 
