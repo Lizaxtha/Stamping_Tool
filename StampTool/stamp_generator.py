@@ -1,18 +1,22 @@
 from krita import *
 import os
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize,Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
     QVBoxLayout,
+    QHBoxLayout,
     QLabel,
     QPushButton,
     QListWidget,
     QListWidgetItem,
-    QFileDialog
+    QFileDialog,
+    QComboBox,
+    QSlider
 )
 
 class StampDialog(QDialog):
+
     def __init__(self):
         super().__init__()
 
@@ -54,6 +58,51 @@ class StampDialog(QDialog):
         layout.addWidget(custom_button)
 
         self.setLayout(layout)
+
+# for Size control
+        size_label =QLabel("Size")
+        layout.addWidget(size_label)
+
+        self.size_slider=QSlider(Qt.Horizontal)
+
+        self.size_slider.setMinimum(10)
+        self.size_slider.setMaximum(200)
+        self.size_slider.setValue(100)
+
+        layout.addWidget(self.size_slider)
+
+# For Rotation control
+        rotation_label=QLabel("Rotation")
+        layout.addWidget(rotation_label)
+
+        self.rotation_slider=QSlider(Qt.Horizontal)
+        
+        self.rotation_slider.setMinimum(0)
+        self.rotation_slider.setMaximum(360)
+        self.rotation_slider.setValue(0)
+        
+        layout.addWidget(self.rotation_slider)
+
+# for Pattern control
+        pattern_label =QLabel("Pattern")
+        layout.addWidget(pattern_label)
+
+        self.pattern_box=QComboBox()
+
+        self.pattern_box.addItems([
+            "Brush",
+            "Random",
+            "Circle",
+            "Spiral",
+            "Grid",
+            "border",
+            "Star"
+        ])
+
+        layout.addWidget(self.pattern_box)
+
+        create_button=QPushButton("Create")
+        layout.addWidget(create_button)
 
     def add_custom_stamp(self):
 
@@ -105,7 +154,7 @@ class StampDialog(QDialog):
 
                 item=QListWidgetItem(
                     QIcon(stamp_path),
-                    stamp.replace(".png")
+                    stamp.replace(".png","")
                 )
 
                 self.stamp_list.addItem(item)
