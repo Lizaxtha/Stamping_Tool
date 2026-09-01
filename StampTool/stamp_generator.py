@@ -1,8 +1,14 @@
-from krita import *
+from krita import Krita, Extension
 import os
-from PyQt5.QtCore import QSize,Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import (
+    QSize,
+    Qt,
+    QObject,
+    QEvent
+)
+from PyQt5.QtGui import QIcon, QImage
 from PyQt5.QtWidgets import (
+    QMessageBox,
     QDialog,
     QVBoxLayout,
     QLabel,
@@ -11,13 +17,16 @@ from PyQt5.QtWidgets import (
     QListWidgetItem,
     QFileDialog,
     QComboBox,
-    QSlider
+    QSlider,
+    QApplication
 )
 
 class StampDialog(QDialog):
 
-    def __init__(self):
+    def __init__(self, canvas_filter):
         super().__init__()
+
+        self.canvas_filter=canvas_filter
 
         self.setWindowTitle("Stamps")
         self.setMinimumWidth(400)
@@ -100,8 +109,11 @@ class StampDialog(QDialog):
 
         layout.addWidget(self.pattern_box)
 
-        create_button=QPushButton("Create")
-        layout.addWidget(create_button)
+        self.create_button=QPushButton("Start Stamping")
+        self.create_button.clicked.connect(
+            self.start_stamping
+        )
+        layout.addWidget(self.create_button)
 
 
     def add_custom_stamp(self):
@@ -123,6 +135,7 @@ class StampDialog(QDialog):
 
         item =QListWidgetItem()
         item.setIcon(QIcon(file_path))
+        item.setData(Qt.UserRole,file_path)
 
         self.stamp_list.addItem(item)
         self.stamps.append(file_path)
@@ -158,14 +171,134 @@ class StampDialog(QDialog):
 
                 item=QListWidgetItem()
                 item.setIcon(QIcon(stamp_path))
+                item.setData(Qt.UserRole, stamp_path)
 
                 self.stamp_list.addItem(item)
-
                 self.stamps.append(stamp_path)
+
+    def get_selected_stamps(self):
+
+        selected_items = self.stamp_list.selectedItems()
+        selected_stamps=[]
+
+        for item in selected_items:
+            stamp_path = item.data(Qt.UserRole)
+
+            if stamp_path:
+                selected_stamps.append(stamp_path)
+        return selected_stamps
+
+    def start_stamping(self):
+        selected_stamps =self.get_selected_stamps()
+
+        if not selected_stamps:
+
+            QMessageBox.warning(
+                self,
+                "No Stamp Selected",
+                "Please select at least one stamp."
+            )
+
+            return
+
+        self.canvas_filter.selected_stamps=selected_stamps
+        self.canvas_filter.current_stamp_index = 0
+        self.canvas_filter.stamping_active =True
+        self.accept()
+
+        QMessageBox.information(
+            self,
+            "Stamp Tool",
+            "Stamping mode is active! Click on the canvas."
+        )
+
+class CanvasClickFilter(QObject):
+
+    def __init__(self,parent=None):
+        super().__init__(parent)
+
+        self.stamping_active = False
+        self.selected_stamps =[]
+        self.current_stamp_index=0
+
+    def eventFilter(self, obj, event):
+
+        if not self.stamping_active:
+            return False
+        
+        if event.type()==QEvent.MouseButtonPress:
+            if event.button()== Qt.LeftButton:
+                print("..")
+        return False
+
+    def place_stamp(self,x,y):
+
+        if not self.selected_stamps:
+            return
+
+        stamp_path=self.selected_stamps[
+            self.current_stamp_index
+        ]
+
+        image=QImage(stamp_path)
+
+        if image.isNull():
+            return
+
+        image = image.convertToFormat(
+            QImage.Format_RGBA8888
+        )
+
+        # Temporary fixed size
+        image = image.scaled(
+            100,100,
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation
+        )
+        width=image.width()
+        height=image.height()
+
+        document=Krita.instance.activeDocument()
+
+        if document is None:
+            return
+
+        layer = document.activeNode()
+
+        if layer is None:
+            return
+
+        bits = image.bits()
+        bits.setsize(
+            image.byteCount()
+        )
+
+        data=bytes(bits)
+
+        draw_x = int(x-width/2)
+        draw_y = int(y-height/2)
+
+        layer.setPixelData(
+            data,
+            draw_x,
+            draw_y,
+            width,
+            height
+        )
+
+        document.refreshProjection()
 class StampTool(Extension):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self.canvas_filter=CanvasClickFilter()
+        self.install_canvas_filter()
+
+    def install_canvas_filter(self):
+        app=QApplication.instance()
+
+        if app:
+            app.installEventFilter(self.canvas_filter)
 
     def setup(self):
         pass
@@ -180,7 +313,7 @@ class StampTool(Extension):
         action.triggered.connect(self.show_dialog)
 
     def show_dialog(self):
-        dialog = StampDialog()
+        dialog = StampDialog(self.canvas_filter)
         dialog.exec_()
 
 
