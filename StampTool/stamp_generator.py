@@ -204,13 +204,8 @@ class StampDialog(QDialog):
         self.canvas_filter.selected_stamps=selected_stamps
         self.canvas_filter.current_stamp_index = 0
         self.canvas_filter.stamping_active =True
-        self.accept()
 
-        QMessageBox.information(
-            self,
-            "Stamp Tool",
-            "Stamping mode is active! Click on the canvas."
-        )
+        self.accept()
 
 class CanvasClickFilter(QObject):
 
@@ -227,8 +222,15 @@ class CanvasClickFilter(QObject):
             return False
         
         if event.type()==QEvent.MouseButtonPress:
+            
             if event.button()== Qt.LeftButton:
-                print("..")
+
+                position = event.pos()
+
+                self.place_stamp(
+                    position.x(),
+                    position.y()
+                )
         return False
 
     def place_stamp(self,x,y):
@@ -258,7 +260,7 @@ class CanvasClickFilter(QObject):
         width=image.width()
         height=image.height()
 
-        document=Krita.instance.activeDocument()
+        document = Krita.instance().activeDocument()
 
         if document is None:
             return

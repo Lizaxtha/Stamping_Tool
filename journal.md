@@ -7,3 +7,5 @@ while trying to add custom stamp button at the beginning, even though i specifie
 09/01 plotted out UI first(i already liked where it was going), then added stamps as builtin. now making it functional would probably take time.
 
 next, i added code to detect mouse events so that stamping on canvas works, but after multiple testing, testing clicks, testing with popups, there is still problem of stamps not being painted in canvas. I'm gonna solve that tomorrow and hopefully add functions to size, rotaion and patterns too.
+
+09/02 after debugging, stamps appear on canvas yay!! now gott center it around cursor.
