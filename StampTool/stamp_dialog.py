@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (
 
 
 class StampDialog(QDialog):
+
     def __init__(self, canvas_filter):
         super().__init__()
 
@@ -150,5 +151,9 @@ class StampDialog(QDialog):
 
         self.canvas_filter.selected_stamps = selected_stamps
         self.canvas_filter.current_stamp_index = 0
+
+        self. canvas_filter.stamp_size = self.size_slider.value()
+        self.canvas_filter.stamp_rotation = self.rotation_slider.value()
+        
         self.canvas_filter.stamping_active = True
         self.accept()

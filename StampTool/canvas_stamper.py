@@ -1,6 +1,6 @@
 from krita import Krita
 from PyQt5.QtCore import Qt, QObject, QEvent
-from PyQt5.QtGui import QImage, QCursor
+from PyQt5.QtGui import QImage, QCursor, QTransform
 from PyQt5.QtWidgets import QWidget, QOpenGLWidget
 
 
@@ -16,6 +16,9 @@ class CanvasClickFilter(QObject):
         self.last_stamp_x = None
         self.last_stamp_y = None
         self.stamp_spacing = 30
+
+        self.stamp_size = 100
+        self.stamp_rotation = 0
         
 
     def eventFilter(self, obj, event):
@@ -119,13 +122,20 @@ class CanvasClickFilter(QObject):
 
         image = image.convertToFormat(QImage.Format_ARGB32)
 
-        # Temporary fixed size
         image = image.scaled(
-            100,
-            100,
+            self.stamp_size,
+            self.stamp_size,
             Qt.KeepAspectRatio,
             Qt.SmoothTransformation,
         )
+
+        if self.stamp_rotation !=0:
+            transform = QTransform()
+            transform.rotate(self.stamp_rotation)
+            image=image.transformed(
+                transform,
+                Qt.SmoothTransformation
+            )
 
         width = image.width()
         height = image.height()
@@ -154,7 +164,7 @@ class CanvasClickFilter(QObject):
             width,
             height,
         )
-        # document.refreshProjection()
+        document.refreshProjection()
 
     def get_canvas_widget(self):
         window = Krita.instance().activeWindow()
