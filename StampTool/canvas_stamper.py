@@ -1,7 +1,9 @@
+import random
 from krita import Krita
 from PyQt5.QtCore import Qt, QObject, QEvent
 from PyQt5.QtGui import QImage, QCursor, QTransform
 from PyQt5.QtWidgets import QWidget, QOpenGLWidget
+from .patterns import PatternGenerator
 
 
 class CanvasClickFilter(QObject):
@@ -19,58 +21,129 @@ class CanvasClickFilter(QObject):
 
         self.stamp_size = 100
         self.stamp_rotation = 0
+
+        self.pattern ="Brush"
+        self.random_offset = 100
+        self.stamp_counter = 0
         
 
     def eventFilter(self, obj, event):
         if not self.stamping_active:
+            self.mouse_down = False
             return False
 
-        if event.type() == QEvent.MouseButtonPress:
-            if event.button() == Qt.LeftButton:
-                position = self.get_document_position()
-
-                if position is not None:
-                    self.mouse_down = True
-
-                    self.last_stamp_x=position.x()
-                    self.last_stamp_y=position.y()
-
-                    self.place_stamp(
-                        position.x(),
-                        position.y())
-                    self.next_stamp()
-                    return True
-
-        if event.type() == QEvent.MouseMove:
-            if self.mouse_down:
-                position = self.get_document_position()
-
-                if position is not None:
-
-                    x = position.x()
-                    y=position.y()
-
-                    dx = x-self.last_stamp_x
-                    dy=y-self.last_stamp_y
-
-                    distance = (dx*dx+dy*dy)**0.5
-
-                    if distance >= self.stamp_spacing:
-
-                        self.place_stamp(x,y)
-                        self.next_stamp()
-                        self.last_stamp_x = x
-                        self.last_stamp_y = y
-                    return True
-
-        if event.type() == QEvent.MouseButtonRelease:
-            if event.button() == Qt.LeftButton:
+        if event.type() == QEvent.KeyPress:
+            if event.key() == Qt.Key_Escape:
+                self.stamping_active = False
                 self.mouse_down = False
                 self.last_stamp_x = None
                 self.last_stamp_y = None
+                self.stamp_counter = 0
+                return False
+
+        if event.type() == QEvent.MouseButtonPress:
+            if event.button() == Qt.LeftButton:
+
+                if not self.is_canvas_event(obj):
+                    return False
+                
+                position = self.get_document_position()
+
+                if position is None:
+                    return False
+                
+                self.last_stamp_x = position.x()
+                self.last_stamp_y = position.y()
+                self.mouse_down = True
+                self.stamp_counter = 0
+
+                canvas_width, canvas_height = self.get_canvas_dimensions()
+
+                positions = PatternGenerator.generate_positions(
+                    self.pattern,
+                    position.x(),
+                    position.y(),
+                    self.stamp_spacing,
+                    self.random_offset,
+                    canvas_width,
+                    canvas_height
+                )
+
+                for stamp_x,stamp_y in positions:
+                    self.place_stamp(stamp_x,stamp_y)
+                    self.next_stamp()
+
                 return True
 
+        if event.type() == QEvent.MouseMove:
+            if not self.mouse_down:
+                return False
+
+            if not self. is_canvas_event(obj):
+                return False
+
+            if self.last_stamp_x is None or self.last_stamp_y is None:
+                self.mouse_down =  False
+                return False
+                
+            position = self.get_document_position()
+
+            if position is None:
+                return False
+
+            if self.pattern.lower() == "circle":
+                return True
+
+            x = position.x()
+            y = position.y()
+
+            dx = x-self.last_stamp_x
+            dy = y-self.last_stamp_y
+            distance = (dx*dx+dy*dy) ** 0.5
+
+            if distance >= self.stamp_spacing:
+                canvas_width, canvas_height = self.get_canvas_dimensions()
+
+                positions = PatternGenerator.generate_positions(
+                    self.pattern,
+                    x,
+                    y,
+                    self.stamp_spacing,
+                    self.random_offset,
+                    canvas_width,
+                    canvas_height
+                )
+                for stamp_x, stamp_y in positions:
+                    self.place_stamp(stamp_x,stamp_y)
+                    self.next_stamp()
+
+                self.last_stamp_x = x
+                self.last_stamp_y = y
+                self.stamp_counter+=1
+            return True
+
+        if event.type() == QEvent.MouseButtonRelease:
+            if event.button() == Qt.LeftButton:
+
+                was_down = self.mouse_down
+
+                self.mouse_down = False
+                self.last_stamp_x = None
+                self.last_stamp_y = None
+                self.stamp_counter = 0
+
+                if was_down and self.is_canvas_event(obj):
+                    return True
+                
+                return False
+
         return False
+
+    def get_canvas_dimensions(self):
+        doc=Krita.instance().activeDocument()
+        if doc:
+            return doc.width(), doc.height()
+        return None, None
 
     def next_stamp(self):
         if not self.selected_stamps:
@@ -80,6 +153,21 @@ class CanvasClickFilter(QObject):
 
         if self.current_stamp_index >= len(self.selected_stamps):
             self.current_stamp_index = 0
+
+    def is_canvas_event(self, obj):
+        canvas_widget = self.get_canvas_widget()
+
+        if canvas_widget is None:
+            return False
+
+        current = obj
+
+        while current is not None:
+            if current == canvas_widget:
+                return True
+
+            current = current.parent()
+        return False
 
     def get_document_position(self):
         window = Krita.instance().activeWindow()

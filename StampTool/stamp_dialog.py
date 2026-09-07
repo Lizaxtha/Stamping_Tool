@@ -71,7 +71,7 @@ class StampDialog(QDialog):
             "Circle",
             "Spiral",
             "Grid",
-            "border",
+            "Border",
             "Star",
         ])
         layout.addWidget(self.pattern_box)
@@ -152,8 +152,9 @@ class StampDialog(QDialog):
         self.canvas_filter.selected_stamps = selected_stamps
         self.canvas_filter.current_stamp_index = 0
 
-        self. canvas_filter.stamp_size = self.size_slider.value()
+        self.canvas_filter.stamp_size = self.size_slider.value()
         self.canvas_filter.stamp_rotation = self.rotation_slider.value()
+        self.canvas_filter.pattern =self.pattern_box.currentText()
         
         self.canvas_filter.stamping_active = True
         self.accept()
