@@ -14,7 +14,9 @@ class PatternGenerator:
         stamp_count=1,
         circle_radius=300, 
         spiral_turns=5, 
-        spiral_spacing=250):
+        spiral_spacing=250,
+        border_spacing=150, 
+        border_margin=60):
 
         if pattern_name == "Brush":
             return PatternGenerator._brush_pattern(x,y)
@@ -27,7 +29,7 @@ class PatternGenerator:
         elif pattern_name == "Grid":
             return PatternGenerator._grid_pattern(x,y,stamp_spacing)
         elif pattern_name == "Border":
-            return PatternGenerator._border_pattern(canvas_width,canvas_height,stamp_spacing)
+            return PatternGenerator._border_pattern(canvas_width,canvas_height,stamp_spacing, border_spacing, border_margin)
         elif pattern_name == "Star":
             return PatternGenerator._star_pattern(x,y,stamp_spacing)
         else:
@@ -101,6 +103,44 @@ class PatternGenerator:
             stamp_y = cy + radius * math.sin(angle)
 
             positions.append((stamp_x,stamp_y))
+
+        return positions
+
+    @staticmethod
+    def _border_pattern(canvas_width, canvas_height, stamp_spacing, border_spacing, border_margin):
+        positions =[]
+
+        if canvas_width is None or canvas_height is None:
+            return positions
+
+        left = border_margin
+        top = border_margin
+        right = canvas_width - border_margin
+        bottom = canvas_height - border_margin
+
+        #top
+        x= left 
+        while x<= right:
+            positions.append((x,top))
+            x +=border_spacing
+
+        #right
+        y = top + border_spacing
+        while y<= bottom:
+            positions.append((right,y))
+            y += border_spacing
+
+        #bottom
+        x =right - border_spacing
+        while x>=left:
+            positions.append((x,bottom))
+            x -=border_spacing
+
+        #left
+        y = bottom - border_spacing
+        while y>top:
+            positions.append((left,y))
+            y-= border_spacing
 
         return positions
 

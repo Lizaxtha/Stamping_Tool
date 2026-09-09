@@ -2,7 +2,7 @@ import random
 from krita import Krita
 from PyQt5.QtCore import Qt, QObject, QEvent
 from PyQt5.QtGui import QImage, QCursor, QTransform
-from PyQt5.QtWidgets import QWidget, QOpenGLWidget, QToolButton
+from PyQt5.QtWidgets import QOpenGLWidget, QToolButton
 from .patterns import PatternGenerator
 
 
@@ -25,9 +25,15 @@ class CanvasClickFilter(QObject):
         self.pattern ="Brush"
         self.random_offset = 400 #increase to increase area of splash in random pattern
         self.random_count = 10
+
         self.circle_radius = 300 # increase or decrease radius of circle [in pixels] in circle pattern
+
         self.spiral_turns = 5 #adjust no. of turns for spiral pattern
         self.spiral_spacing = 250 #adjust distance between turns in spiral pattern
+
+        self.border_spacing = 150 # distance between each stamp
+        self.border_margin = 60 # distance from the canvas border
+
         self.stamp_counter = 0
         
 
@@ -66,7 +72,7 @@ class CanvasClickFilter(QObject):
                     return False
 
                 #pattern : random, circle and spiral
-                if self.pattern in ("Random","Circle","Spiral"):
+                if self.pattern in ("Random","Circle","Spiral","Border"):
                     canvas_width,canvas_height = self.get_canvas_dimensions()
 
                     positions = PatternGenerator.generate_positions(
@@ -80,8 +86,9 @@ class CanvasClickFilter(QObject):
                         stamp_count = self.random_count,
                         circle_radius=self.circle_radius,
                         spiral_turns=self.spiral_turns,
-                        spiral_spacing=self.spiral_spacing
-
+                        spiral_spacing=self.spiral_spacing,
+                        border_spacing = self.border_spacing,
+                        border_margin = self.border_margin
                     )
 
                     for stamp_x, stamp_y in positions:

@@ -1,7 +1,7 @@
 rough idea sketch
 ![alt text](IMG_20260830_180824.jpg)
 
-08/31 added custom stamp button
+08/31 added custom stamp button.
 while trying to add custom stamp button at the beginning, even though i specified to only accept png,jpg,jpeg.. while running, it literally even accepted sb3 and folders lol.
 
 09/01 plotted out UI first(i already liked where it was going), then added stamps as builtin. now making it functional would probably take time.
@@ -36,4 +36,8 @@ now gotta make some changes in canvas_stamper.py > get_canvas_widget coz it's ge
 
 09/08 i removed get_canvas_widget and let is_canvas_event and get_canvas_from_object do the job.then used QToolButton so that it stops stamping when i choose other tools. after testing and fixing these problems, random pattern worked smoothly too as well as circle. 
 
-09/09 i just completed adding spiral pattern and it looked so pretty damn. also i combined random circle and spiral patterns in one block because if i want to add ore patterns in future creating new blocks of codes would take so much space right?!
+09/09 i just completed adding spiral pattern and it looked so pretty damn. also i combined random circle and spiral patterns in one block because if i want to add ore patterns in future creating new blocks of codes would take so much space right?! 
+
+border pattern was a bit tricky but it's done too!!
+Debugging when popups appear in krita was kind of easy.
+
