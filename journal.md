@@ -36,3 +36,4 @@ now gotta make some changes in canvas_stamper.py > get_canvas_widget coz it's ge
 
 09/08 i removed get_canvas_widget and let is_canvas_event and get_canvas_from_object do the job.then used QToolButton so that it stops stamping when i choose other tools. after testing and fixing these problems, random pattern worked smoothly too as well as circle. 
 
+09/09 i just completed adding spiral pattern and it looked so pretty damn. also i combined random circle and spiral patterns in one block because if i want to add ore patterns in future creating new blocks of codes would take so much space right?!

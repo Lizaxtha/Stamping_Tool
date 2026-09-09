@@ -3,7 +3,18 @@ import math
 class PatternGenerator:
 
     @staticmethod
-    def generate_positions(pattern_name, x, y, stamp_spacing, random_offset, canvas_width=None, canvas_height=None, stamp_count=1,circle_radius=150):
+    def generate_positions(
+        pattern_name, 
+        x, 
+        y, 
+        stamp_spacing, 
+        random_offset, 
+        canvas_width=None, 
+        canvas_height=None, 
+        stamp_count=1,
+        circle_radius=300, 
+        spiral_turns=5, 
+        spiral_spacing=250):
 
         if pattern_name == "Brush":
             return PatternGenerator._brush_pattern(x,y)
@@ -12,7 +23,7 @@ class PatternGenerator:
         elif pattern_name == "Circle":
             return PatternGenerator._circle_pattern(x,y,circle_radius,stamp_count)
         elif pattern_name == "Spiral":
-            return PatternGenerator._spiral_pattern(x,y,stamp_spacing)
+            return PatternGenerator._spiral_pattern(x,y,spiral_turns, spiral_spacing)
         elif pattern_name == "Grid":
             return PatternGenerator._grid_pattern(x,y,stamp_spacing)
         elif pattern_name == "Border":
@@ -73,3 +84,23 @@ class PatternGenerator:
             positions.append((stamp_x, stamp_y))
 
         return positions
+
+
+    @staticmethod
+    def _spiral_pattern(cx,cy,spiral_turns, spiral_spacing):
+        positions = []
+
+        points_per_turn = 20
+        total_points = spiral_turns*points_per_turn
+
+        for i in range(total_points):
+            angle = (2*math.pi*i)/points_per_turn
+            radius = spiral_spacing *i/points_per_turn
+
+            stamp_x = cx + radius * math.cos(angle)
+            stamp_y = cy + radius * math.sin(angle)
+
+            positions.append((stamp_x,stamp_y))
+
+        return positions
+
