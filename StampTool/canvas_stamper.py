@@ -2,7 +2,7 @@ import random
 from krita import Krita
 from PyQt5.QtCore import Qt, QObject, QEvent
 from PyQt5.QtGui import QImage, QCursor, QTransform
-from PyQt5.QtWidgets import QWidget, QOpenGLWidget
+from PyQt5.QtWidgets import QWidget, QOpenGLWidget, QToolButton
 from .patterns import PatternGenerator
 
 
@@ -23,7 +23,9 @@ class CanvasClickFilter(QObject):
         self.stamp_rotation = 0
 
         self.pattern ="Brush"
-        self.random_offset = 100
+        self.random_offset = 400 #increase to increase area of splash in random pattern
+        self.random_count = 10
+        self.circle_radius = 300 # increase or decrease radius of circle [in pixels]
         self.stamp_counter = 0
         
 
@@ -42,16 +44,68 @@ class CanvasClickFilter(QObject):
                 return False
 
         if event.type() == QEvent.MouseButtonPress:
+
+            if self.is_tool_button_event(obj):
+                self.stamping_active = False
+                self.mouse_down = False
+                self.last_stamp_x = None
+                self.last_stamp_y = None
+                self.stamp_counter = 0
+                return False
+            
             if event.button() == Qt.LeftButton:
 
                 if not self.is_canvas_event(obj):
                     return False
                 
-                position = self.get_document_position()
+                position = self.get_document_position(obj)
 
                 if position is None:
                     return False
-                
+
+                #pattern : random
+                if self.pattern == "Random":
+
+                    canvas_width,canvas_height = self.get_canvas_dimensions()
+
+                    positions = PatternGenerator.generate_positions(
+                        self.pattern,
+                        position.x(),
+                        position.y(),
+                        self.stamp_spacing,
+                        self.random_offset,
+                        canvas_width,
+                        canvas_height,
+                        self.random_count
+                    )
+
+                    for stamp_x, stamp_y in positions:
+                        self.place_stamp(stamp_x,stamp_y)
+                        self.next_stamp()
+
+                    return True
+
+                #pattern:circle
+                if self.pattern == "Circle":
+                    canvas_width,canvas_height = self.get_canvas_dimensions()
+                    positions = PatternGenerator.generate_positions(
+                        self.pattern,
+                        position.x(),
+                        position.y(),
+                        self.stamp_spacing,
+                        self.random_offset,
+                        canvas_width,
+                        canvas_height,
+                        len(self.selected_stamps),
+                        self.circle_radius
+                    )
+
+                    for stamp_x, stamp_y in positions:
+                        self.place_stamp(stamp_x,stamp_y)
+                        self.next_stamp()
+                    return True
+
+                # default brush pattern        
                 self.last_stamp_x = position.x()
                 self.last_stamp_y = position.y()
                 self.mouse_down = True
@@ -79,14 +133,14 @@ class CanvasClickFilter(QObject):
             if not self.mouse_down:
                 return False
 
-            if not self. is_canvas_event(obj):
+            if not self.is_canvas_event(obj):
                 return False
 
             if self.last_stamp_x is None or self.last_stamp_y is None:
                 self.mouse_down =  False
                 return False
                 
-            position = self.get_document_position()
+            position = self.get_document_position(obj)
 
             if position is None:
                 return False
@@ -155,21 +209,27 @@ class CanvasClickFilter(QObject):
             self.current_stamp_index = 0
 
     def is_canvas_event(self, obj):
-        canvas_widget = self.get_canvas_widget()
-
-        if canvas_widget is None:
-            return False
-
         current = obj
 
         while current is not None:
-            if current == canvas_widget:
+            if isinstance(current, QOpenGLWidget):
                 return True
 
             current = current.parent()
         return False
 
-    def get_document_position(self):
+    def is_tool_button_event(self, obj):
+        current = obj
+
+        while current is not None:
+            if isinstance(current, QToolButton):
+                return True
+
+            current = current.parent()
+
+            return False
+
+    def get_document_position(self, obj=None):
         window = Krita.instance().activeWindow()
 
         if window is None:
@@ -180,7 +240,7 @@ class CanvasClickFilter(QObject):
         if view is None:
             return None
 
-        canvas_widget = self.get_canvas_widget()
+        canvas_widget = self.get_canvas_from_object(obj)
 
         if canvas_widget is None:
             return None
@@ -254,26 +314,11 @@ class CanvasClickFilter(QObject):
         )
         document.refreshProjection()
 
-    def get_canvas_widget(self):
-        window = Krita.instance().activeWindow()
+    def get_canvas_from_object(self,obj):
+        current = obj
 
-        if window is None:
-            return None
-
-        qwindow = window.qwindow()
-
-        if qwindow is None:
-            return None
-
-        view = window.activeView()
-
-        if view is None:
-            return None
-
-        view_widget = qwindow.findChild(QWidget, "view_0")
-
-        if view_widget is None:
-            return None
-
-        canvas_widget = view_widget.findChild(QOpenGLWidget)
-        return canvas_widget
+        while current is not None:
+            if isinstance(current,QOpenGLWidget):
+                return current
+            current = current.parent()
+        return None

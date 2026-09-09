@@ -28,6 +28,11 @@ size & rotation was easy, just passing value to canvas_stamper.py since UI was a
 
 there are still some problems now , the eraser tool or any other tool doesn't work on canvas after stamping. also i think i need to show value of chosen size and rotation in slider to users.
 
-09/06 i'm working with patterns today! i worked till random pattern but then  thought that maybe i should make a separate file for patterns so if i want more pattterns in future i can add to it right?! but when i tried doing that errors kept occuring. [at the end i found out it was because of intendation lol]
+09/06 i'm working with patterns today! i worked till random pattern but then thought that maybe i should make a separate file for patterns so if i want more pattterns in future i can add to it right?! but when i tried doing that errors kept occuring. [at the end i found out it was because of intendation lol]
 
-09/07 worked on QApplication errors and fixed eventfilter to make sure stamp dialogbox doesn't stop other tools from working. this took a lot of time than expected and even took help of chatgpt for debugging. now gotta make some changes in canvas_stamper.py > get_canvas_widget so that it doesn't get stuck on the old canvas.
+09/07 worked on QApplication errors and fixed eventfilter to make sure stamp dialogbox doesn't stop other tools from working. this took a lot of time than expected and even took help of chatgpt for debugging. 
+
+now gotta make some changes in canvas_stamper.py > get_canvas_widget coz it's getting stuck on old canvas and can't be used for new canvas. 
+
+09/08 i removed get_canvas_widget and let is_canvas_event and get_canvas_from_object do the job.then used QToolButton so that it stops stamping when i choose other tools. after testing and fixing these problems, random pattern worked smoothly too as well as circle. 
+

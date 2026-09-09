@@ -1,17 +1,16 @@
 import random
 import math
-
 class PatternGenerator:
 
     @staticmethod
-    def generate_positions(pattern_name, x, y, stamp_spacing, random_offset, canvas_width=None, canvas_height=None):
+    def generate_positions(pattern_name, x, y, stamp_spacing, random_offset, canvas_width=None, canvas_height=None, stamp_count=1,circle_radius=150):
 
         if pattern_name == "Brush":
             return PatternGenerator._brush_pattern(x,y)
         elif pattern_name == "Random":
-            return PatternGenerator._random_pattern(x,y,random_offset)
+            return PatternGenerator._random_pattern(x,y,random_offset, stamp_count)
         elif pattern_name == "Circle":
-            return PatternGenerator._circle_pattern(x,y,stamp_spacing)
+            return PatternGenerator._circle_pattern(x,y,circle_radius,stamp_count)
         elif pattern_name == "Spiral":
             return PatternGenerator._spiral_pattern(x,y,stamp_spacing)
         elif pattern_name == "Grid":
@@ -28,22 +27,49 @@ class PatternGenerator:
         return [(x,y)]
     
     @staticmethod
-    def _random_pattern(x,y,offset):
-        return[(
-            x+random.randint(-offset, offset),
-            y+random.randint(-offset, offset),
+    def _random_pattern(x,y,offset, stamp_count):
+        positions = []
 
-        )]
+        min_distance = offset*0.35
+
+        for _ in range(stamp_count):
+
+            attempts = 0
+
+            while attempts < 100:
+
+                angle = random.uniform(0,2*math.pi)
+                distance = random.uniform(0, offset)
+        
+                random_x = x+math.cos(angle)*distance
+                random_y = y+math.sin(angle)*distance
+
+                too_close = False
+
+                for existing_x, existing_y in positions:
+                    dx=random_x - existing_x
+                    dy = random_y - existing_y
+
+                    if(dx*dx + dy*dy)<(min_distance*min_distance):
+                        too_close = True
+                        break
+
+                if not too_close:
+                    positions.append((random_x,random_y))
+                    break
+
+                attempts +=1
+
+        return positions
 
     @staticmethod
-    def _circle_pattern(cx,cy,radius):
+    def _circle_pattern(cx,cy,radius,stamp_count):
         positions = []
-        num_stamps = 12
 
-        for i in range(num_stamps):
-            angle = (2*math.pi*i)/num_stamps
-            stamp_x = cx + radius *3*math.cos(angle)
-            stamp_y = cy + radius *3*math.sin(angle)
+        for i in range(stamp_count):
+            angle = (2*math.pi*i)/stamp_count
+            stamp_x = cx + radius * math.cos(angle)
+            stamp_y = cy + radius * math.sin(angle)
             positions.append((stamp_x, stamp_y))
 
         return positions
