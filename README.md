@@ -2,7 +2,7 @@
 - It is a Krita Plugin made using Python that allows users to use built-in stamps, add custom stamps, choose size, rotate and use patterns on canvas.
 
 ## Preview
-<img width="1065" height="418" alt="Screenshot 2026-09-10 142853" src="https://github.com/user-attachments/assets/29259e8c-a7b9-451a-9a16-3d670b7f0867" />
+<img width="800" height="418" alt="Screenshot 2026-09-10 142853" src="https://github.com/user-attachments/assets/29259e8c-a7b9-451a-9a16-3d670b7f0867" />
 
 
 ## How to install it?
