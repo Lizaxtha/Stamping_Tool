@@ -30,4 +30,4 @@ The Stamp Tool dialog will appear, and the plugin is ready to use!!
   Spiral : creates a spiral of 5 turns on the canvas
   Border : creates border on the edges of your canvas.
 
-- **To stop stamping click on any other tool in krita such as brush, select etc.**
+#### **To stop stamping click on any other tool in krita such as brush, select etc.**
