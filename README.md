@@ -18,4 +18,16 @@
 
 The Stamp Tool dialog will appear, and the plugin is ready to use!!
 
-## How to use it ?
+## Features
+* you can select one or more stamps and start start stamping.
+* you can add custom stamp (png, jpg,jpeg images)
+* increase or decrease size of the chosen stamps
+* rotate the stamps
+* choose patterns :
+  brush : works as default, you can click or drag to stamp using this
+  random : splashes stamps around the cursor for every click
+  circle : makes circle around the click
+  spiral : creates a spiral of 5 turns on the canvas
+  border : creates border on the edges of your canvas.
+
+- to stop stamping click on any other tool in krita such as brush, select etc.
