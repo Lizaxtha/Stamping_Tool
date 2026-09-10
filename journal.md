@@ -2,7 +2,7 @@ rough idea sketch
 ![alt text](IMG_20260830_180824.jpg)
 
 08/31 added custom stamp button.
-while trying to add custom stamp button at the beginning, even though i specified to only accept png,jpg,jpeg.. while running, it literally even accepted sb3 and folders lol.
+while trying to add custom stamp button at the beginning, even though i specified to only accept png,jpg,jpeg.. while running, it literally even accepted sb3 and folders.
 
 09/01 plotted out UI first(i already liked where it was going), then added stamps as builtin. now making it functional would probably take time.
 
@@ -12,13 +12,13 @@ next, i added code to detect mouse events so that stamping on canvas works, but 
 
 09/03->09/05 the stamp is finally centered around cursor after adjusting x,y coordinates. 
 
-even though i used PNGs and transparent background, the stamps on canvas shows white background [i'll keep that for later]
+even though i used PNGs and transparent background, the stamps on canvas shows white background [i'll keep that for later] *fixed it later(09/10) with help of chatgpt by using QPainter.
 
 also to make stamp tool as the active layer and no other brushes could overwrite it[coz while testing the select and brush tool were also being used simultaneously with stamp tool] i used activeNode() and setPixelData(). 
 
 also, used current_stamp_index and next_stamp() to make the sequence of multiple selected stamps.
 
-used MouseButtonPress,MouseMove and MouseButtonReleased to make stamping smooth and dragable. 
+used MouseButtonPress,MouseMove and MouseButtonReleased [simply events] to make stamping smooth and dragable. 
 
 then added spacing between each stamp so it appears neat and doesn't get generated for every single mouse event.
 
@@ -30,14 +30,14 @@ there are still some problems now , the eraser tool or any other tool doesn't wo
 
 09/06 i'm working with patterns today! i worked till random pattern but then thought that maybe i should make a separate file for patterns so if i want more pattterns in future i can add to it right?! but when i tried doing that errors kept occuring. [at the end i found out it was because of intendation lol]
 
-09/07 worked on QApplication errors and fixed eventfilter to make sure stamp dialogbox doesn't stop other tools from working. this took a lot of time than expected and even took help of chatgpt for debugging. 
+09/07 worked on QApplication errors and fixed eventfilter to make sure stamp dialogbox doesn't stop other tools from working. this took a lot of time than expected and i took help of chatgpt for debugging. 
 
-now gotta make some changes in canvas_stamper.py > get_canvas_widget coz it's getting stuck on old canvas and can't be used for new canvas. 
+now gotta make some changes in canvas_stamper.py > get_canvas_widget coz it's getting stuck on old canvas and can't be used for new canvas.
 
 09/08 i removed get_canvas_widget and let is_canvas_event and get_canvas_from_object do the job.then used QToolButton so that it stops stamping when i choose other tools. after testing and fixing these problems, random pattern worked smoothly too as well as circle. 
 
-09/09 i just completed adding spiral pattern and it looked so pretty damn. also i combined random circle and spiral patterns in one block because if i want to add ore patterns in future creating new blocks of codes would take so much space right?! 
+09/09 i just completed adding spiral pattern and it looked so pretty damn. also i combined random, circle and spiral patterns in one block because if i want to add more patterns in future, creating new blocks of codes would take so much space right?! 
 
 border pattern was a bit tricky but it's done too!!
-Debugging when popups appear in krita was kind of easy.
 
+This was a fun project to do at the end. probably will add more patterns or other features in future.

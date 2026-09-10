@@ -1,9 +1,7 @@
 from krita import Krita, Extension
 from PyQt5.QtWidgets import QApplication
-
 from .stamp_dialog import StampDialog
 from .canvas_stamper import CanvasClickFilter
-# from .patterns import PatternGenerator
 class StampTool(Extension):
     def __init__(self, parent):
         super().__init__(parent)

@@ -1,8 +1,8 @@
 import random
 from krita import Krita
 from PyQt5.QtCore import Qt, QObject, QEvent
-from PyQt5.QtGui import QImage, QCursor, QTransform
-from PyQt5.QtWidgets import QOpenGLWidget, QToolButton
+from PyQt5.QtGui import QImage, QCursor, QTransform, QPainter
+from PyQt5.QtWidgets import QOpenGLWidget, QToolButton, QMessageBox
 from .patterns import PatternGenerator
 
 
@@ -219,7 +219,7 @@ class CanvasClickFilter(QObject):
 
             current = current.parent()
 
-            return False
+        return False
 
     def get_document_position(self, obj=None):
         window = Krita.instance().activeWindow()
@@ -290,15 +290,22 @@ class CanvasClickFilter(QObject):
         if layer is None:
             return
 
-        bits = image.bits()
-        bits.setsize(image.byteCount())
-        data = bytes(bits)
-
         draw_x = int(x - width / 2)
         draw_y = int(y - height / 2)
 
+    # this makes png transparent on canvas, so transparent areas do not erase stamps underneath
+        old = bytes(layer.pixelData(draw_x,draw_y,width,height))
+        result = QImage(old,width,height,width*4,QImage.Format_ARGB32).copy()
+
+        painter = QPainter(result)
+        painter.drawImage(0,0,image)
+        painter.end()
+
+        bits = result.bits()
+        bits.setsize(result.byteCount())
+
         layer.setPixelData(
-            data,
+            bytes(bits),
             draw_x,
             draw_y,
             width,

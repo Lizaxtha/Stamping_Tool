@@ -4,4 +4,4 @@ ServiceTypes=Krita/PythonPlugin
 X-KDE-Library=StampTool
 X-Python-2-Compatible=false
 Name=Stamp Tool
-Comment=Generate decorative stamp patterns
+Comment=A stamp tool plugin for Krita

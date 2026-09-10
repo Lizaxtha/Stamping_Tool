@@ -70,9 +70,7 @@ class StampDialog(QDialog):
             "Random",
             "Circle",
             "Spiral",
-            "Grid",
-            "Border",
-            "Star",
+            "Border"
         ])
         layout.addWidget(self.pattern_box)
 

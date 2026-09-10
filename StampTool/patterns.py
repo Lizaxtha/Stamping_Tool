@@ -26,12 +26,8 @@ class PatternGenerator:
             return PatternGenerator._circle_pattern(x,y,circle_radius,stamp_count)
         elif pattern_name == "Spiral":
             return PatternGenerator._spiral_pattern(x,y,spiral_turns, spiral_spacing)
-        elif pattern_name == "Grid":
-            return PatternGenerator._grid_pattern(x,y,stamp_spacing)
         elif pattern_name == "Border":
             return PatternGenerator._border_pattern(canvas_width,canvas_height,stamp_spacing, border_spacing, border_margin)
-        elif pattern_name == "Star":
-            return PatternGenerator._star_pattern(x,y,stamp_spacing)
         else:
             return [(x,y)]
 
